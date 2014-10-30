@@ -1,0 +1,215 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="login_duration">
+    <start to="preparefs"/>
+
+	<action name="preparefs">
+        <fs>
+	       <mkdir path="${dbdir}/00/103"/>
+	       <mkdir path="${dbdir}/01/103"/>
+	       <mkdir path="${dbdir}/02/103"/>
+	       <mkdir path="${dbdir}/03/103"/>
+	       <mkdir path="${dbdir}/04/103"/>
+	       <mkdir path="${dbdir}/05/103"/>
+	       <mkdir path="${dbdir}/06/103"/>
+	       <mkdir path="${dbdir}/07/103"/>
+	       <mkdir path="${dbdir}/08/103"/>
+	       <mkdir path="${dbdir}/09/103"/>
+	       <mkdir path="${dbdir}/10/103"/>
+	       <mkdir path="${dbdir}/11/103"/>
+	       <mkdir path="${dbdir}/12/103"/>
+	       <mkdir path="${dbdir}/13/103"/>
+	       <mkdir path="${dbdir}/14/103"/>
+	       <mkdir path="${dbdir}/15/103"/>
+	       <mkdir path="${dbdir}/16/103"/>
+	       <mkdir path="${dbdir}/17/103"/>
+	       <mkdir path="${dbdir}/17/103"/>
+	       <mkdir path="${dbdir}/19/103"/>
+	       <mkdir path="${dbdir}/20/103"/>
+	       <mkdir path="${dbdir}/21/103"/>
+	       <mkdir path="${dbdir}/22/103"/>
+		<mkdir path="${dbdir}/23/103"/>
+	        <mkdir path="${dbdir}/00/104"/>
+	       <mkdir path="${dbdir}/01/104"/>
+	       <mkdir path="${dbdir}/02/104"/>
+	       <mkdir path="${dbdir}/03/104"/>
+	       <mkdir path="${dbdir}/04/104"/>
+	       <mkdir path="${dbdir}/05/104"/>
+	       <mkdir path="${dbdir}/06/104"/>
+	       <mkdir path="${dbdir}/07/104"/>
+	       <mkdir path="${dbdir}/08/104"/>
+	       <mkdir path="${dbdir}/09/104"/>
+	       <mkdir path="${dbdir}/10/104"/>
+	       <mkdir path="${dbdir}/11/104"/>
+	       <mkdir path="${dbdir}/12/104"/>
+	       <mkdir path="${dbdir}/13/104"/>
+	       <mkdir path="${dbdir}/14/104"/>
+	       <mkdir path="${dbdir}/15/104"/>
+	       <mkdir path="${dbdir}/16/104"/>
+	       <mkdir path="${dbdir}/17/104"/>
+	       <mkdir path="${dbdir}/17/104"/>
+	       <mkdir path="${dbdir}/19/104"/>
+	       <mkdir path="${dbdir}/20/104"/>
+	       <mkdir path="${dbdir}/21/104"/>
+	       <mkdir path="${dbdir}/22/104"/>
+	       <mkdir path="${dbdir}/23/104"/>
+        </fs>
+        <ok to="countmapper"/>
+        <error to="senderror"/>
+    </action>
+    <!--action name="countmapper">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <prepare>
+				<delete path="${outputData}"/>
+            </prepare>
+            <configuration>
+				<property>
+					<name>mapred.reducer.new-api</name>
+					<value>true</value>
+				</property>
+				<property>
+					<name>mapred.mapper.new-api</name>
+					<value>true</value>
+				</property>
+
+
+		<property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+
+
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xms1024m -Xmx2048m -XX:-UseGCOverheadLimit -Dfile.encoding=UTF-8</value>
+				</property>
+
+
+
+                <property>
+                    <name>mapreduce.map.class</name>
+		    <value>org.apache.hadoop.dzh.logintime.LoginTimeMapper</value>
+                </property>
+                <property>
+                    <name>mapreduce.reduce.class</name>
+		    <value>org.apache.hadoop.dzh.logintime.LoginTimeReducer</value>
+                </property>
+                  
+
+				<property>
+					<name>mapred.mapoutput.key.class</name>
+					<value>org.apache.hadoop.io.Text</value>
+				</property>
+
+				<property>
+					<name>mapred.mapoutput.value.class</name>
+					<value>org.apache.hadoop.io.Text</value>
+				</property>
+
+                <property>
+                    <name>mapred.max.split.size</name>
+		    <value>${maxSplitSize}</value>
+                </property>
+
+
+                <property>
+                    <name>mapred.min.split.size</name>
+		    <value>${minSplitSize}</value>
+                </property>
+
+                <property>
+                    <name>mapred.reduce.tasks</name>
+		    <value>1</value>
+                </property>
+                <property>
+                    <name>mapred.input.dir</name>
+                    <value>${inputData}</value>
+                </property>
+
+                <property>
+
+                    <name>mapreduce.outputformat.class</name>                    
+                    <value>org.apache.hadoop.dzh.logintime.MultiOutputFormat</value>
+
+                </property>
+
+                <property>
+                    <name>mapred.output.dir</name>
+		    <value>${outputData}</value>
+                </property>
+            </configuration>
+        </map-reduce>
+
+        <ok to="took"/>
+        <error to="senderror"/>
+    </action>
+
+	<action name="took">
+		
+
+                <fs>
+                   <touchz path='${outputData}/_SUCCESS' />
+                </fs>
+
+	        <ok to="notify-etl"/>
+		<error to="senderror"/>
+	</action>
+
+
+  <action name="notify-etl">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <main-class>com.gw.oozie.mqaction.MQAction</main-class>
+            <arg>org.apache.activemq.jndi.ActiveMQInitialContextFactory</arg>
+            <arg>${mqbroker}</arg>
+            <arg>datanotify</arg>
+            <arg>queue</arg>
+            <arg>{"name":"mobile_login_duration","dir":"${outputData}","time":${logDate}}</arg>
+        </java>
+        <ok to="end"/>
+        <error to="senderror"/>
+  </action>
+
+
+
+    <action name="senderror">
+		<email xmlns="uri:oozie:email-action:0.1">
+			<to>${email_to}</to>
+			<cc>${email_cc}</cc> <!-- cc is optional -->
+			<subject>oozie error</subject>
+			<body>error occur in ${logDate} count login workflow please check it ${oozie_url}</body>
+		</email>
+		<ok to="fail"/>
+		<error to="fail"/>
+	</action-->
+
+
+    <kill name="fail">
+        <message>Map/Reduce failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

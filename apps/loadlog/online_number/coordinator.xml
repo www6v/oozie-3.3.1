@@ -1,0 +1,109 @@
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
+	
+    http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+<coordinator-app name="online_number" frequency="${coord:hours(1)}" start="${start}" end="${end}" timezone="GMT+0800"
+                 xmlns="uri:oozie:coordinator:0.2">
+  <controls>
+    <concurrency>1</concurrency>
+  </controls>
+
+  <datasets>
+	<dataset name="raw-logs" frequency="${coord:hours(1)}" initial-instance="${datasetInitTime}" timezone="GMT+0800">
+	  <uri-template>${nameNode}/BA/data/crm_log/raw_log/${YEAR}/${MONTH}/${DAY}/${HOUR}/104</uri-template>
+
+	  <done-flag></done-flag>
+        </dataset>
+
+
+        <dataset name="raw-logs1" frequency="${coord:hours(1)}" initial-instance="${datasetInitTime}" timezone="GMT+0800">
+
+          <uri-template>${nameNode}/BA/data/crm_log/raw_log/${YEAR}/${MONTH}/${DAY}/${HOUR}/103</uri-template> <!-- -->
+            
+          <done-flag></done-flag>
+        </dataset>
+
+
+	<dataset name="result-logs" frequency="${coord:hours(1)}" initial-instance="${datasetInitTime}" timezone="GMT+0800">
+
+	  <uri-template>${nameNode}/BA/data/crm_log/log_tbl/online_number/${YEAR}/${MONTH}/${DAY}/${HOUR}</uri-template>  <!-- -->
+          
+        </dataset>
+  </datasets>
+
+  <input-events>
+    <data-in name="input" dataset="raw-logs">
+      <instance>${coord:current(-1)}</instance>
+    </data-in>
+
+
+    <data-in name="input1" dataset="raw-logs1"> <!-- -->
+      <instance>${coord:current(-1)}</instance>
+    </data-in>
+
+  </input-events>
+
+  <output-events>
+    <data-out name="output" dataset="result-logs">
+      <instance>${coord:current(-1)}</instance>
+    </data-out>
+  </output-events>
+
+  <action>
+    <workflow>
+	  <app-path>${nameNode}${appPath}</app-path>
+      <configuration>
+        <property>
+          <name>jobTracker</name>
+          <value>${jobTracker}</value>
+        </property>
+        <property>
+          <name>nameNode</name>
+          <value>${nameNode}</value>
+        </property>
+        <property>
+          <name>queueName</name>
+          <value>${queueName}</value>
+        </property>
+
+
+
+        <property>
+          <name>inputData</name>
+          <value>${coord:dataIn('input')}</value>
+        </property>
+
+
+
+        <property>   <!-- -->
+          <name>inputData1</name>
+          <value>${coord:dataIn('input1')}</value>
+        </property>
+        
+
+        <property>
+          <name>outputData</name>
+          <value>${coord:dataOut('output')}</value>
+        </property>
+        <property>
+          <name>logDate</name>
+		  <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, 'HOUR'), 'yyyyMMddhh')}</value>
+        </property>
+      </configuration>
+    </workflow>
+  </action>
+</coordinator-app>
+

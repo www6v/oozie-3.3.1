@@ -1,0 +1,287 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<coordinator-app name="login_duration" frequency="${coord:days(1)}" start="${start}" end="${end}" timezone="GMT+0800"
+                 xmlns="uri:oozie:coordinator:0.2">
+    <controls>
+        <concurrency>1</concurrency>
+    </controls>
+
+    <datasets>
+		<!--dataset name="input-logs" frequency="${coord:hours(1)}" initial-instance="${datasetInitTime}" timezone="GMT+0800">
+			<uri-template>${nameNode}/BA/data/crm_log/raw_log/${YEAR}/${MONTH}/${DAY}/${HOUR}/104</uri-template>                        
+                        <done-flag></done-flag>
+                </dataset>
+
+                <dataset name="input-logs_103" frequency="${coord:hours(1)}" initial-instance="${datasetInitTime}" timezone="GMT+0800">
+                        <uri-template>${nameNode}/BA/data/crm_log/raw_log/${YEAR}/${MONTH}/${DAY}/${HOUR}/103</uri-template>
+                        <done-flag></done-flag>
+                </dataset-->
+
+		<dataset name="out-logs" frequency="${coord:days(1)}" initial-instance="${datasetInitTime}" timezone="GMT+0800">
+			<uri-template>${nameNode}${outputPath}/${YEAR}/${MONTH}/${DAY}</uri-template>
+                </dataset>
+    </datasets>
+
+    
+
+    <output-events>
+
+
+        <!--data-out name="input" dataset="input-logs">
+            <instance>${coord:current(-1)}</instance>
+        </data-out>
+        <data-out name="input1" dataset="input-logs">
+            <instance>${coord:current(-2)}</instance>
+        </data-out>
+
+        <data-out name="input2" dataset="input-logs">
+            <instance>${coord:current(-24)}</instance>
+        </data-out>
+
+        <data-out name="input3" dataset="input-logs">
+            <instance>${coord:current(-3)}</instance>
+        </data-out>
+
+        <data-out name="input4" dataset="input-logs">
+            <instance>${coord:current(-4)}</instance>
+        </data-out>
+
+        <data-out name="input5" dataset="input-logs">
+            <instance>${coord:current(-5)}</instance>
+        </data-out>
+
+        <data-out name="input6" dataset="input-logs">
+            <instance>${coord:current(-6)}</instance>
+        </data-out>
+
+        <data-out name="input7" dataset="input-logs">
+            <instance>${coord:current(-7)}</instance>
+        </data-out>
+
+        <data-out name="input8" dataset="input-logs">
+            <instance>${coord:current(-8)}</instance>
+        </data-out>
+
+        <data-out name="input9" dataset="input-logs">
+            <instance>${coord:current(-9)}</instance>
+        </data-out>
+
+        <data-out name="input10" dataset="input-logs">
+            <instance>${coord:current(-10)}</instance>
+        </data-out>
+
+        <data-out name="input11" dataset="input-logs">
+            <instance>${coord:current(-11)}</instance>
+        </data-out>
+
+        <data-out name="input12" dataset="input-logs">
+            <instance>${coord:current(-12)}</instance>
+        </data-out>
+
+        <data-out name="input13" dataset="input-logs">
+            <instance>${coord:current(-13)}</instance>
+        </data-out>
+
+        <data-out name="input14" dataset="input-logs">
+            <instance>${coord:current(-14)}</instance>
+        </data-out>
+
+        <data-out name="input15" dataset="input-logs">
+            <instance>${coord:current(-15)}</instance>
+        </data-out>
+
+        <data-out name="input16" dataset="input-logs">
+            <instance>${coord:current(-16)}</instance>
+        </data-out>
+
+        <data-out name="input17" dataset="input-logs">
+            <instance>${coord:current(-17)}</instance>
+        </data-out>
+
+        <data-out name="input18" dataset="input-logs">
+            <instance>${coord:current(-18)}</instance>
+        </data-out>
+
+
+        <data-out name="input19" dataset="input-logs">
+            <instance>${coord:current(-19)}</instance>
+        </data-out>
+
+        <data-out name="input20" dataset="input-logs">
+            <instance>${coord:current(-20)}</instance>
+        </data-out>
+
+        <data-out name="input21" dataset="input-logs">
+            <instance>${coord:current(-21)}</instance>
+        </data-out>
+
+        <data-out name="input22" dataset="input-logs">
+            <instance>${coord:current(-22)}</instance>
+        </data-out>
+
+        <data-out name="input23" dataset="input-logs">
+            <instance>${coord:current(-23)}</instance>
+        </data-out>
+
+
+
+
+
+        <data-out name="input_103" dataset="input-logs_103">
+            <instance>${coord:current(-1)}</instance>
+        </data-out>
+        <data-out name="input1_103" dataset="input-logs_103">
+            <instance>${coord:current(-2)}</instance>
+        </data-out>
+
+        <data-out name="input2_103" dataset="input-logs_103">
+            <instance>${coord:current(-24)}</instance>
+        </data-out>
+
+        <data-out name="input3_103" dataset="input-logs_103">
+            <instance>${coord:current(-3)}</instance>
+        </data-out>
+
+        <data-out name="input4_103" dataset="input-logs_103">
+            <instance>${coord:current(-4)}</instance>
+        </data-out>
+
+        <data-out name="input5_103" dataset="input-logs_103">
+            <instance>${coord:current(-5)}</instance>
+        </data-out>
+
+        <data-out name="input6_103" dataset="input-logs_103">
+            <instance>${coord:current(-6)}</instance>
+        </data-out>
+
+        <data-out name="input7_103" dataset="input-logs_103">
+            <instance>${coord:current(-7)}</instance>
+        </data-out>
+
+        <data-out name="input8_103" dataset="input-logs_103">
+            <instance>${coord:current(-8)}</instance>
+        </data-out>
+
+        <data-out name="input9_103" dataset="input-logs_103">
+            <instance>${coord:current(-9)}</instance>
+        </data-out>
+
+        <data-out name="input10_103" dataset="input-logs_103">
+            <instance>${coord:current(-10)}</instance>
+        </data-out>
+
+        <data-out name="input11_103" dataset="input-logs_103">
+            <instance>${coord:current(-11)}</instance>
+        </data-out>
+
+        <data-out name="input12_103" dataset="input-logs_103">
+            <instance>${coord:current(-12)}</instance>
+        </data-out>
+
+        <data-out name="input13_103" dataset="input-logs_103">
+            <instance>${coord:current(-13)}</instance>
+        </data-out>
+
+        <data-out name="input14_103" dataset="input-logs_103">
+            <instance>${coord:current(-14)}</instance>
+        </data-out>
+
+        <data-out name="input15_103" dataset="input-logs_103">
+            <instance>${coord:current(-15)}</instance>
+        </data-out>
+
+        <data-out name="input16_103" dataset="input-logs_103">
+            <instance>${coord:current(-16)}</instance>
+        </data-out>
+
+        <data-out name="input17_103" dataset="input-logs_103">
+            <instance>${coord:current(-17)}</instance>
+        </data-out>
+
+        <data-out name="input18_103" dataset="input-logs_103">
+            <instance>${coord:current(-18)}</instance>
+        </data-out>
+
+        <data-out name="input19_103" dataset="input-logs_103">
+            <instance>${coord:current(-19)}</instance>
+        </data-out>
+
+        <data-out name="input20_103" dataset="input-logs_103">
+            <instance>${coord:current(-20)}</instance>
+        </data-out>
+
+        <data-out name="input21_103" dataset="input-logs_103">
+            <instance>${coord:current(-21)}</instance>
+        </data-out>
+
+        <data-out name="input22_103" dataset="input-logs_103">
+            <instance>${coord:current(-22)}</instance>
+        </data-out>
+
+        <data-out name="input23_103" dataset="input-logs_103">
+            <instance>${coord:current(-23)}</instance>
+        </data-out-->
+
+
+        <data-out name="output" dataset="out-logs">
+            <instance>${coord:current(-1)}</instance>
+        </data-out>
+    </output-events>
+
+    <action>
+        <workflow>
+
+	    <app-path>${nameNode}${appPath}</app-path>
+
+            <configuration>
+                <property>
+                    <name>jobTracker</name>
+                    <value>${jobTracker}</value>
+                </property>
+                <property>
+                    <name>nameNode</name>
+                    <value>${nameNode}</value>
+                </property>
+                <property>
+                    <name>queueName</name>
+                    <value>${queueName}</value>
+                </property>
+                <property>
+                    <name>outputData</name>
+                    <value>${coord:dataOut('output')}</value>
+                </property>
+                <property>
+                    <name>minSplitSize</name>
+					<value>67108864</value>
+                </property>
+                <property>
+                    <name>maxSplitSize</name>
+					<value>67108864</value>
+                </property>
+                <property>
+                    <name>logDate</name>
+					<value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, 'DAY'), 'yyyyMMdd')}</value>
+                </property>
+                <property>
+                    <name>dbdir</name>
+                        <value>${nameNode}/BA/data/crm_log/raw_log/${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, 'DAY'), 'yyyy/MM/dd')}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>
+

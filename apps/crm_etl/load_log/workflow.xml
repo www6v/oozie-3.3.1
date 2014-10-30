@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="load_crm_log">
+  <start to="sqoop-node"/>
+  <action name="sqoop-node">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>${queueName}</value>
+        </property>
+      </configuration>
+	<arg>import</arg>
+	<arg>--connect</arg>
+	<arg>${mysqljdbc}</arg>
+	<arg>--username</arg>
+	<arg>${mysqluser}</arg>
+	<arg>--password</arg>
+	<arg>${mysqlpw}</arg>
+	<arg>--query</arg>
+	<arg>select ID,UserID,MacAddr,UserName,MobileNO,MobileNO_Enc,wifi,3G,cmnet,cmwap,MbType,MbOS,Ver,IP,Country,Region,City,Isp,Flow,FirstLogin,LastLogin,LoginTimes,OnlineTime,Fun1001,Fun1002,Fun1003,Fun1004,Fun1005,Fun1006,Fun1007,Fun1008,Fun1009,Fun1010,Fun1011,Fun1012,Fun1013,Fun1014,Fun1015,Fun1016,Fun1017,Fun1018,Fun1019,Fun1020,Fun1021,Fun1022,Fun1023,Fun1024,Fun1025,Fun1026,Fun1027,Fun1028,Fun1029,Fun1030,Fun1031,Fun1032,Fun1033,Fun1034,Fun1035,Fun1036,Fun1037,Fun1038,Fun1039,Fun1040,Fun1041,Fun1042,Fun1043,Fun1044,Fun1045,Fun1046,Fun1047,Fun1048,Fun1049,Fun1050,Fun1051,Fun1052,Fun1053,Fun1054,Fun1055,Fun1056,Fun1057,Fun1058,Fun1059,Fun1060,Fun1061,Fun1062,Fun1063,Fun1064,Fun1065,Fun1066,Fun1067,Fun1068,Fun1069,Fun1070,Fun1071,Fun1072,Fun1073,Fun1074,Fun1075,Fun1076,Fun1077,Fun1078,Fun1079,Fun1080,Fun1081,Fun1082,Fun1083,Fun1084,Fun1085,Fun1086,Fun1087,Fun1088,Fun1089,Fun1090,Fun1091,Fun1092,Fun1093,Fun1094,Fun1095,Fun1096,Fun1097,Fun1098,Fun1099,Fun1100 from ${tablename} where $CONDITIONS</arg>
+	<arg>--boundary-query</arg>
+	<arg>select min(ID),max(ID) FROM ${tablename}</arg>
+	<arg>--split-by</arg>
+	<arg>ID</arg>
+	<arg>-m</arg>
+	<arg>10</arg>
+	<arg>--null-string</arg>
+	<arg>\\N</arg>
+	<arg>--null-non-string</arg>
+	<arg>\\N</arg>
+	<arg>--fields-terminated-by</arg>
+	<arg>\001</arg>
+	<arg>--delete-target-dir</arg>
+	<arg>--target-dir</arg>
+	<arg>${outputData}</arg>
+    </sqoop>
+    <ok to="hive-node"/>
+    <error to="senderror"/>
+  </action>
+  <action name="hive-node">
+    <hive xmlns="uri:oozie:hive-action:0.2">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>${queueName}</value>
+        </property>
+		<property>
+		  <name>oozie.hive.defaults</name>
+		  <value>my-hive-default.xml</value>
+		</property>
+		<property>
+			<name>hive.metastore.local</name>
+			<value>true</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionURL</name>
+			<value>${ooziejdbc}</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionDriverName</name>
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionUserName</name>
+			<value>${ooziejdbcuser}</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionPassword</name>
+			<value>${ooziejdbcpw}</value>
+		</property>
+		<property>
+			<name>datanucleus.fixedDatastore</name>
+			<value>false</value>
+		</property>
+      </configuration>
+      <script>script.q</script>
+      <param>LOGDATE=${logDate}</param>
+      <param>OUTPATH=${outputData}</param>
+	</hive>
+    <ok to="took"/>
+    <error to="senderror"/>
+  </action>
+  <action name="took">
+	<fs>
+	  <touchz path='${outputData}/_READY' />
+	</fs>
+	<ok to="end"/>
+	<error to="senderror"/>
+  </action>
+  <action name="senderror">
+	<email xmlns="uri:oozie:email-action:0.1">
+	  <to>${email_to}</to>
+	  <cc>${email_cc}</cc> <!-- cc is optional -->
+	  <subject>oozie error</subject>
+	  <body>error occur in ${logDate} load mysql index meta data
+	  hive table workflow please check it ${oozie_url}</body>
+	</email>
+	<ok to="fail"/>
+	<error to="fail"/>
+  </action>
+
+  <kill name="fail">
+    <message>Sqoop failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>

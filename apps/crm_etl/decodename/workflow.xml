@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="decode-hive-wf">
+  <start to="hive-node"/>
+
+  <action name="hive-node">
+    <hive xmlns="uri:oozie:hive-action:0.2">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>${queueName}</value>
+        </property>
+		<property>
+		  <name>oozie.hive.defaults</name>
+		  <value>my-hive-default.xml</value>
+		</property>
+		<property>
+			<name>hive.metastore.local</name>
+			<value>true</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionURL</name>
+			<value>${ooziejdbc}</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionDriverName</name>
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionUserName</name>
+			<value>${ooziejdbcuser}</value>
+		</property>
+		<property>
+			<name>javax.jdo.option.ConnectionPassword</name>
+			<value>${ooziejdbcpw}</value>
+		</property>
+		<property>
+			<name>datanucleus.fixedDatastore</name>
+			<value>false</value>
+		</property>
+      </configuration>
+      <script>script.q</script>
+      <param>LOGDATE=${logDate}</param>
+      <param>APPROOT=${approot}</param>
+      <param>OUTHIVEPATH=${outputData}</param>
+	</hive>
+    <ok to="took"/>
+    <error to="senderror"/>
+  </action>
+
+  <action name="took">
+	<fs>
+	  <touchz path='${outputData}/_READY' />
+	</fs>
+	<ok to="end"/>
+	<error to="senderror"/>
+  </action>
+  <action name="senderror">
+	<email xmlns="uri:oozie:email-action:0.1">
+	  <to>${email_to}</to>
+	  <cc>${email_cc}</cc> <!-- cc is optional -->
+	  <subject>oozie error</subject>
+	  <body>error occur in ${logDate} calc index data in hive workflow please check it ${oozie_url}</body>
+	</email>
+	<ok to="fail"/>
+	<error to="fail"/>
+  </action>
+
+  <kill name="fail">
+    <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>

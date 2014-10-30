@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="notify-to-oracle">
+  <start to="action-node"/>
+  <action name="action-node">
+	<java>
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<configuration>
+		<property>
+		<name>mapred.job.queue.name</name>
+		<value>${queueName}</value>
+		</property>
+		</configuration>
+		<main-class>com.gw.oozie.action.App</main-class>
+		<arg>oracle.jdbc.driver.OracleDriver</arg>
+		<arg>jdbc:oracle:thin:@10.15.89.225:1521:info</arg>
+		<arg>wfrun</arg>
+		<arg>wfrun225</arg>
+		<arg>INSERT INTO WFRUN.INFA_WFRUN_FLAG(FLAG,DATA_DATE,STATUS) VALUES('UPLOAD_LOG',${logDate},0)</arg>
+	</java>
+    <ok to="end"/>
+    <error to="senderror"/>
+  </action>
+  <action name="senderror">
+	<email xmlns="uri:oozie:email-action:0.1">
+	  <to>${email_to}</to>
+	  <cc>${email_cc}</cc> <!-- cc is optional -->
+	  <subject>oozie error</subject>
+	  <body>error occur in ${logDate} to notify oracle ,please check it ${oozie_url}</body>
+	</email>
+	<ok to="fail"/>
+	<error to="fail"/>
+  </action>
+
+  <kill name="fail">
+    <message>Sqoop failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
