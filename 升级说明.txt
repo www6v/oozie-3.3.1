@@ -3,20 +3,20 @@ hadoop fs -put oozie /oozie
 
 2.cd oozie/apps/loadlog/bundle/,修改job.properties文件
 nameNode为hdfs namenode例如：
-nameNode=hdfs://10.15.43.7:9000
+nameNode=hdfs://10.15.43.x:9000
 jobTracker为hadoopjobtracker例如:
-jobTracker=10.15.43.7:9001
+jobTracker=10.15.43.x:9001
 
 hivejdbc存放hive元数据的mysql数据库 例如
-hivejdbc=jdbc:mysql://10.15.43.7:3306/hive?createDatabaseIfNotExist=true
-hiveuser=root
-hivepsw=111111
+hivejdbc=jdbc:mysql://10.15.43.x:3306/hive?createDatabaseIfNotExist=true
+hiveuser=xxxxx
+hivepsw=xxxxx
 
 start任务开始时间 例如
 start=2014-08-28T11:00+0800
 email_to 任务成功失败邮件通知列表 例如
-email_to=gumeng@gw.com.cn
-email_cc=gumeng@gw.com.cn
+email_to=xxxxx@gw.com.cn
+email_cc=xxxxx@gw.com.cn
 
 3.启动工作流
 oozie job -oozie http://localhost:11000/oozie -config  ./job.properties -run
